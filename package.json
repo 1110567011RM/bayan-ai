@@ -1,110 +1,40 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-enum Role {
-  ADMIN
-  USER
-}
-
-enum UserStatus {
-  ACTIVE
-  SUSPENDED
-}
-
-enum MessageRole {
-  USER
-  ASSISTANT
-  SYSTEM
-}
-
-model User {
-  id           String         @id @default(cuid())
-  name         String
-  email        String         @unique
-  passwordHash String
-  role         Role           @default(USER)
-  status       UserStatus     @default(ACTIVE)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-
-  bots          Bot[]
-  conversations Conversation[]
-  usage         Usage[]
-}
-
-model Bot {
-  id            String         @id @default(cuid())
-  name          String
-  description   String?
-  avatarUrl     String?
-  persona       String?
-  systemPrompt  String
-  language      String         @default("ar")
-  tone          String         @default("professional")
-  temperature   Float          @default(0.7)
-  maxTokens     Int            @default(1024)
-  isActive      Boolean        @default(true)
-
-  ownerId       String
-  owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  conversations Conversation[]
-  usage         Usage[]
-
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
-model Conversation {
-  id        String    @id @default(cuid())
-  title     String?
-  botId     String
-  userId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  messages  Message[]
-  bot       Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  usage     Usage[]
-}
-
-model Message {
-  id             String         @id @default(cuid())
-  conversationId String
-  role           MessageRole
-  content        String
-  tokens         Int?
-  createdAt      DateTime       @default(now())
-
-  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-}
-
-model Usage {
-  id               String         @id @default(cuid())
-  userId           String
-  botId            String?
-  conversationId   String?
-  model            String
-  promptTokens     Int            @default(0)
-  completionTokens Int            @default(0)
-  totalTokens      Int            @default(0)
-  createdAt        DateTime       @default(now())
-
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bot              Bot?           @relation(fields: [botId], references: [id], onDelete: SetNull)
-  conversation     Conversation?  @relation(fields: [conversationId], references: [id], onDelete: SetNull)
-}
-
-model Setting {
-  key       String   @id
-  value     String
-  isSecret  Boolean  @default(false)
-  updatedAt DateTime @updatedAt
+{
+  "name": "bayan",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "next": "14.2.15",
+    "next-auth": "^4.24.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.3",
+    "zod": "^3.23.8",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4",
+    "lucide-react": "^0.454.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
 }
