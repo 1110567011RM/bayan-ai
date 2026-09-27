@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         Role           @default(USER)
+  status       UserStatus     @default(ACTIVE)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  bots          Bot[]
+  conversations Conversation[]
+  usage         Usage[]
+}
+
+model Bot {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  avatarUrl     String?
+  persona       String?
+  systemPrompt  String
+  language      String         @default("ar")
+  tone          String         @default("professional")
+  temperature   Float          @default(0.7)
+  maxTokens     Int            @default(1024)
+  isActive      Boolean        @default(true)
+
+  ownerId       String
+  owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  conversations Conversation[]
+  usage         Usage[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  title     String?
+  botId     String
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  messages  Message[]
+  bot       Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usage     Usage[]
+}
+
+model Message {
+  id             String         @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String
+  tokens         Int?
+  createdAt      DateTime       @default(now())
+
+  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Usage {
+  id               String         @id @default(cuid())
+  userId           String
+  botId            String?
+  conversationId   String?
+  model            String
+  promptTokens     Int            @default(0)
+  completionTokens Int            @default(0)
+  totalTokens      Int            @default(0)
+  createdAt        DateTime       @default(now())
+
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot              Bot?           @relation(fields: [botId], references: [id], onDelete: SetNull)
+  conversation     Conversation?  @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  isSecret  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
