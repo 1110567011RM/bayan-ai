@@ -69,4 +69,4 @@ export function jsonError(error: unknown) {
     },
     { status: 500 }
   );
-
+}
