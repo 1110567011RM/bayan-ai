@@ -15,3 +15,4 @@ export default function RootLayout({
       <body>{children}</body>
     </html>
   );
+}
