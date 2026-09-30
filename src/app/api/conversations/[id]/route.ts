@@ -57,7 +57,7 @@ export async function GET(
   } catch (error) {
     return jsonError(error);
   }
-}}
+}
 
 /**
  * PATCH /api/conversations/[id]
