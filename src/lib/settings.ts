@@ -4,10 +4,9 @@ export const SETTING_KEYS = {
   DEEPSEEK_API_KEY: "DEEPSEEK_API_KEY",
 } as const;
 
-export const SECRET_KEYS = [
+export const SECRET_KEYS: string[] = [
   SETTING_KEYS.DEEPSEEK_API_KEY,
-] as const;
-
+];
 export async function getSetting(
   key: string
 ): Promise<string | null> {
