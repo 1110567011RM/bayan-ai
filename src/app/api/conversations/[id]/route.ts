@@ -66,8 +66,11 @@ export async function GET(
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
     const user = await requireUser();
-    await loadConversation(params.id, user.id, user.role);
-
+await loadConversation(
+  params.id,
+  user.id,
+  user.role === "ADMIN" ? "ADMIN" : "USER"
+);
     const raw = await request.json().catch(() => null);
     if (!raw || typeof raw !== "object") {
       throw new ApiError("جسم الطلب غير صالح.", 400);
