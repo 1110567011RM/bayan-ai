@@ -15,7 +15,7 @@ type RouteContext = { params: { id: string } };
 async function loadConversation(
   id: string,
   userId: string,
-  role: "ADMIN" | "USER"
+  role: string
 ) {
   const conversation = await prisma.conversation.findUnique({
     where: { id },
