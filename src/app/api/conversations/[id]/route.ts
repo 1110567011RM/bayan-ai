@@ -42,11 +42,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     const user = await requireUser();
 const role = user.role === "ADMIN" ? "ADMIN" : "USER";
 
-const conversation = await loadConversation(
-  params.id,
-  user.id,
-  role
-);    return NextResponse.json({ conversation });
+const conversation = await loadConversation(params.id, user.id, role););    return NextResponse.json({ conversation });
   } catch (error) {
     return jsonError(error);
   }
