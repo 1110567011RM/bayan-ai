@@ -37,16 +37,27 @@ async function loadConversation(
  * GET /api/conversations/[id]
  * يعيد المحادثة مع كل رسائلها.
  */
-export async function GET(_request: NextRequest, { params }: RouteContext) {
+export async function GET(
+  _request: NextRequest,
+  { params }: RouteContext
+) {
   try {
     const user = await requireUser();
-const role = user.role === "ADMIN" ? "ADMIN" : "USER";
 
-const conversation = await loadConversation(params.id, user.id, role););    return NextResponse.json({ conversation });
+    const role =
+      user.role === "ADMIN" ? "ADMIN" : "USER";
+
+    const conversation = await loadConversation(
+      params.id,
+      user.id,
+      role
+    );
+
+    return NextResponse.json({ conversation });
   } catch (error) {
     return jsonError(error);
   }
-}
+}}
 
 /**
  * PATCH /api/conversations/[id]
